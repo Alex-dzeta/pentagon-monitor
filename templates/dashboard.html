@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pentagon Activity Monitor</title>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header {
+            text-align: center;
+            padding: 25px 0 15px;
+            border-bottom: 1px solid #222;
+            margin-bottom: 25px;
+        }
+        header h1 { font-size: 1.4rem; color: #ff6b35; letter-spacing: 2px; }
+        header .subtitle { color: #666; font-size: 0.8rem; margin-top: 4px; }
+
+        /* Grid layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+
+        /* Cards */
+        .card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .card h2 {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .card-full { grid-column: 1 / -1; }
+
+        /* DEFCON panel */
+        .hero-panel {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .defcon-badge {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 3px solid;
+            flex-shrink: 0;
+        }
+        .defcon-badge .level { font-size: 2.8rem; }
+        .defcon-badge .label { font-size: 0.65rem; letter-spacing: 2px; }
+        .defcon-1 { background: #0a2e0a; border-color: #2d8a2d; color: #4caf50; }
+        .defcon-2 { background: #2e2e0a; border-color: #8a8a2d; color: #cddc39; }
+        .defcon-3 { background: #2e1f0a; border-color: #8a6a2d; color: #ff9800; }
+        .defcon-4 { background: #2e0f0a; border-color: #8a3a2d; color: #f44336; }
+        .defcon-5 { background: #2e0a1f; border-color: #8a2d6a; color: #e91e63; }
+
+        .hero-info { text-align: center; }
+        .index-value { font-size: 3.2rem; font-weight: bold; color: #fff; }
+        .index-label { font-size: 0.7rem; color: #666; letter-spacing: 1px; }
+        .mode-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+        .mode-normal { background: #1a3a1a; color: #4caf50; }
+        .mode-degraded { background: #3a3a1a; color: #ff9800; }
+        .mode-stale { background: #3a1a1a; color: #f44336; }
+
+        .hero-meta {
+            text-align: left;
+            font-size: 0.8rem;
+            line-height: 1.8;
+        }
+        .hero-meta .label { color: #555; }
+        .hero-meta .val { color: #ccc; }
+        .trend-up { color: #f44336; }
+        .trend-down { color: #4caf50; }
+        .trend-stable { color: #888; }
+
+        /* DC time card */
+        .dc-time {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .dc-label { color: #666; font-size: 0.7rem; letter-spacing: 1px; }
+        .dc-context {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        .dc-night { background: #2e0a1f; color: #e91e63; }
+        .dc-weekend { background: #2e1f0a; color: #ff9800; }
+        .dc-normal { background: #1a1a1a; color: #888; }
+
+        /* Health */
+        .health-row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .health-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-up { background: #4caf50; }
+        .dot-down { background: #f44336; }
+
+        /* Venues table */
+        .venues-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .venues-table th {
+            text-align: left;
+            padding: 6px 10px;
+            border-bottom: 1px solid #333;
+            color: #555;
+            font-size: 0.68rem;
+            letter-spacing: 1px;
+        }
+        .venues-table td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .venues-table tr:hover { background: #151515; }
+        .cat-pizza { color: #ff6b35; }
+        .cat-bar { color: #9c27b0; }
+        .spike-badge {
+            color: #f44336;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+
+        /* Pop bar */
+        .pop-bar-wrap { display: flex; align-items: center; gap: 8px; }
+        .pop-bar {
+            width: 60px;
+            height: 6px;
+            background: #1a1a1a;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .pop-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        .pop-low { background: #4caf50; }
+        .pop-med { background: #ff9800; }
+        .pop-high { background: #f44336; }
+
+        /* Spikes */
+        .spike-card {
+            padding: 10px 14px;
+            background: #1a0a0a;
+            border: 1px solid #3a1a1a;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .spike-card .name { color: #f44336; font-weight: bold; font-size: 0.85rem; }
+        .spike-card .detail { color: #888; font-size: 0.75rem; margin-top: 3px; }
+        .no-spikes { color: #444; font-size: 0.8rem; text-align: center; padding: 20px; }
+
+        /* Events timeline */
+        .event-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #1a1a1a;
+            font-size: 0.78rem;
+        }
+        .event-item:last-child { border-bottom: none; }
+        .event-date {
+            color: #555;
+            white-space: nowrap;
+            min-width: 80px;
+        }
+        .event-defcon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .event-body { flex: 1; }
+        .event-name { color: #ccc; }
+        .event-desc { color: #555; font-size: 0.7rem; margin-top: 2px; }
+        .event-tags { margin-top: 4px; }
+        .tag {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            background: #1a1a2e;
+            color: #6666aa;
+            margin-right: 4px;
+            margin-top: 2px;
+        }
+
+        .meta {
+            text-align: center;
+            color: #333;
+            font-size: 0.65rem;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #1a1a1a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container"
+         hx-get="/"
+         hx-trigger="every 60s"
+         hx-select=".container"
+         hx-swap="outerHTML">
+
+        <header>
+            <h1>PENTAGON ACTIVITY MONITOR</h1>
+            <div class="subtitle">PIZZA & BAR OSINT INDEX</div>
+        </header>
+
+        {% set defcon = status.get('defcon', 1) %}
+        {% set index = status.get('index', 0) %}
+        {% set mode = status.get('mode', 'normal') %}
+
+        <!-- Hero: DEFCON + Index + Meta -->
+        <div class="hero-panel">
+            <div class="defcon-badge defcon-{{ defcon }}">
+                <div class="level">{{ defcon }}</div>
+                <div class="label">DEFCON</div>
+            </div>
+
+            <div class="hero-info">
+                <div class="index-value">{{ "%.1f"|format(index) }}</div>
+                <div class="index-label">OVERALL INDEX (0-10)</div>
+                <div class="mode-badge mode-{{ mode }}">{{ mode | upper }}</div>
+            </div>
+
+            <div class="hero-meta">
+                <div>
+                    <span class="label">Trend: </span>
+                    <span class="val trend-{{ trend.direction }}">{{ trend_label }}</span>
+                </div>
+                <div>
+                    <span class="label">DC Time: </span>
+                    <span class="val">{{ dc_time }} ET</span>
+                </div>
+                <div>
+                    <span class="label">Context: </span>
+                    <span class="val">{{ dc_context }}</span>
+                </div>
+                <div>
+                    <span class="label">Sources: </span>
+                    <span class="val">{{ status.get('sources', []) | join(', ') }}</span>
+                </div>
+                <div>
+                    <span class="label">Venues: </span>
+                    <span class="val">{{ status.get('venues_reporting', 0) }}/{{ status.get('venues_total', 0) }} reporting</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health row -->
+        <div class="health-row">
+            {% for h in health %}
+            <div class="health-item">
+                <div class="dot {{ 'dot-up' if h.success else 'dot-down' }}"></div>
+                <span>{{ h.collector }}</span>
+                {% if h.duration_ms %}<span style="color:#444">({{ h.duration_ms }}ms)</span>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Row: Chart + DC/Spikes -->
+        <div class="grid-2">
+            <!-- Chart -->
+            <div class="card">
+                <h2>Index History (24h)</h2>
+                <canvas id="indexChart" height="160"></canvas>
+            </div>
+
+            <!-- Right column: DC context + Spikes -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- DC Time -->
+                <div class="card">
+                    <h2>Washington DC</h2>
+                    <div class="dc-time">{{ dc_time }}</div>
+                    <div class="dc-label">EASTERN TIME</div>
+                    <div class="dc-context {{ 'dc-night' if dc_is_night else ('dc-weekend' if dc_is_weekend else 'dc-normal') }}">
+                        {{ dc_context }}
+                        {% if dc_is_night %}
+                        <br>Night activity at Pentagon-area venues is a strong anomaly signal.
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Active Spikes -->
+                <div class="card" style="flex: 1;">
+                    <h2>Active Spikes</h2>
+                    {% if spikes %}
+                        {% for sp in spikes[:4] %}
+                        <div class="spike-card">
+                            <div class="name">{{ sp.name }}</div>
+                            <div class="detail">
+                                Popularity: {{ sp.current_popularity or '?' }}
+                                {% if sp.percentage_of_usual %} | {{ "%.0f"|format(sp.percentage_of_usual) }}% of usual{% endif %}
+                                {% if sp.spike_magnitude %} | {{ "%.1f"|format(sp.spike_magnitude) }}x spike{% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-spikes">No active spikes detected</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Venues -->
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>Venues</h2>
+            <table class="venues-table">
+                <thead>
+                    <tr>
+                        <th>NAME</th>
+                        <th>TYPE</th>
+                        <th>POPULARITY</th>
+                        <th>% OF USUAL</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in status.get('venues', []) %}
+                    <tr>
+                        <td>{{ v.name }}</td>
+                        <td class="cat-{{ v.category }}">{{ v.category | upper }}</td>
+                        <td>
+                            {% if v.current_popularity is not none %}
+                            <div class="pop-bar-wrap">
+                                <span>{{ v.current_popularity }}</span>
+                                <div class="pop-bar">
+                                    <div class="pop-bar-fill {{ 'pop-low' if v.current_popularity < 40 else ('pop-med' if v.current_popularity < 70 else 'pop-high') }}"
+                                         style="width: {{ v.current_popularity }}%"></div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span style="color:#333">Closed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if v.percentage_of_usual %}
+                                <span class="{{ 'trend-up' if v.percentage_of_usual > 150 else ('trend-stable' if v.percentage_of_usual > 80 else 'trend-down') }}">
+                                    {{ "%.0f"|format(v.percentage_of_usual) }}%
+                                </span>
+                            {% else %}
+                                <span style="color:#333">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if v.is_spike %}
+                                <span class="spike-badge">SPIKE{% if v.spike_magnitude %} {{ "%.1f"|format(v.spike_magnitude) }}x{% endif %}</span>
+                            {% else %}
+                                <span style="color:#333">Normal</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Historical Events -->
+        <div class="card">
+            <h2>Historical Events (similar DEFCON levels)</h2>
+            {% for ev in events[:8] %}
+            <div class="event-item">
+                <div class="event-date">{{ ev.date }}</div>
+                <div class="event-defcon defcon-{{ ev.defcon_peak }}">{{ ev.defcon_peak }}</div>
+                <div class="event-body">
+                    <div class="event-name">{{ ev.event_name }}</div>
+                    <div class="event-desc">
+                        {{ ev.description }}
+                        | Peak index: {{ ev.index_peak }} | Duration: {{ ev.duration_hours }}h
+                    </div>
+                    <div class="event-tags">
+                        {% for tag in ev.get('tags', []) %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="meta">
+            Last update: {{ status.get('timestamp', 'N/A') }} |
+            Auto-refresh: 60s |
+            API: <a href="/docs" style="color:#555">/docs</a> |
+            Widget: <a href="/api/v1/widget" style="color:#555">/api/v1/widget</a>
+        </div>
+    </div>
+
+    <script>
+        const historyData = {{ history | tojson }};
+        if (historyData.length > 0) {
+            const ctx = document.getElementById('indexChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: historyData.map(d => {
+                        const dt = new Date(d.timestamp);
+                        return dt.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                    }),
+                    datasets: [{
+                        label: 'Index',
+                        data: historyData.map(d => d.overall_index),
+                        borderColor: '#ff6b35',
+                        backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                    }, {
+                        label: 'DEFCON',
+                        data: historyData.map(d => d.defcon_level),
+                        borderColor: '#f44336',
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        yAxisID: 'defcon',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { ticks: { color: '#444', maxTicksLimit: 12 }, grid: { color: '#1a1a1a' } },
+                        y: { min: 0, max: 10, ticks: { color: '#444' }, grid: { color: '#1a1a1a' },
+                             title: { display: true, text: 'Index', color: '#444' } },
+                        defcon: { position: 'right', min: 1, max: 5, reverse: true,
+                                  ticks: { color: '#444', stepSize: 1 }, grid: { display: false },
+                                  title: { display: true, text: 'DEFCON', color: '#444' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#666', usePointStyle: true } },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            titleColor: '#999',
+                            bodyColor: '#ccc',
+                        }
+                    }
+                }
+            });
+        } else {
+            document.getElementById('indexChart').parentElement.innerHTML +=
+                '<div style="color:#333;text-align:center;padding:40px">Collecting data... chart will appear after first update cycle</div>';
+        }
+    </script>
+</body>
+</html>
