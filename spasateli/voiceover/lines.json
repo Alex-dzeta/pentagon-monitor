@@ -1,0 +1,10 @@
+[
+ {"id":"v1","voice":"Charon","style":"calm, slightly ironic male narrator, audiobook, brisk pace","text":"Из газеты я знал: пятнадцатого декабря одиннадцатого года русский купец Овчинников проиграется в «Фортуне», поставив на семнадцать чёрное. Выпадет восемнадцать."},
+ {"id":"v2","voice":"Charon","style":"calm, slightly ironic male narrator, audiobook, brisk pace","text":"Я искал толстого купца. А он оказался худым, как жердь."},
+ {"id":"v3","voice":"Charon","style":"tense male narrator, quick, excited whisper","text":"Он — на семнадцать. Я — всё, что у меня было, — на восемнадцать."},
+ {"id":"v4","voice":"Charon","style":"stunned male narrator, quiet","text":"Двадцать четыре. Купец тоже проиграл — и снова поставил на семнадцать."},
+ {"id":"v5","voice":"Charon","style":"bitter, ironic male narrator, audiobook, slow","text":"Газета не соврала. Она лишь умолчала, что ставил он дважды."},
+ {"id":"c1","voice":"Orus","style":"bored, formal French casino croupier, speaks French","text":"Faites vos jeux."},
+ {"id":"c2","voice":"Orus","style":"bored, formal French casino croupier, speaks French","text":"Vingt-quatre, noir."},
+ {"id":"c3","voice":"Orus","style":"loud, formal French casino croupier announcing, speaks French","text":"Dix-huit, rouge!"}
+]

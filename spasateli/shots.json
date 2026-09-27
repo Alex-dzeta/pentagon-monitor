@@ -1,34 +1,67 @@
 {
   "style": "hand-painted 2D animation, styled like a 1911 autochrome photograph, muted colors, warm gold chandelier light against cold green baize, soft film grain, gentle vignette, Berlin 1911",
   "shots": [
-    {"id": 1, "duration": 4,
-     "image": "Snowy night street in Berlin 1911, Kurfürstendamm, horse-drawn carriages, glowing sign 'Fortuna' above a grand casino entrance, gas lamps",
-     "motion": "slow push-in toward the entrance, snow falling, a carriage passes"},
-    {"id": 2, "duration": 5,
-     "image": "Opulent casino hall 1911, mirrors, crystal chandeliers, dark spiral columns, gilded paintings, ladies in long dark gowns, gentlemen in tailcoats with monocles, stewards in red embroidered jackets carrying trays",
-     "motion": "smooth dolly over the crowd, stewards moving between tables"},
-    {"id": 3, "duration": 4,
-     "image": "Clean-shaven man about 35 in a sand-colored military-style tunic, looking around a casino hall, a servant nods toward a tall thin man in a long dark-blue naval-style frock coat",
-     "motion": "the man in the tunic looks surprised, then steps back into the crowd"},
-    {"id": 4, "duration": 5,
-     "image": "Roulette table in a 1911 casino, tall thin man in dark-blue frock coat sitting, stacks of gold and silver coins, spectators standing in a tight semicircle, croupier in tailcoat",
-     "motion": "the thin man lays out coin stacks, croupier gestures to place bets",
-     "audio": "croupier says: Faites vos jeux"},
-    {"id": 5, "duration": 4,
-     "image": "Close-up of a hand placing a tall stack of gold coins on number 17 black on green baize; a second hand in a sand-colored sleeve pushes silver coins onto 18 red",
-     "motion": "quick hurried push of silver coins"},
-    {"id": 6, "duration": 5,
-     "image": "Macro shot of an ivory roulette ball bouncing across brass pockets of a spinning chrome roulette wheel",
-     "motion": "ball slows and settles in pocket 24 black, croupier's rake sweeps coins away"},
-    {"id": 7, "duration": 4,
-     "image": "Close-up of the man in the sand-colored tunic, shocked face, reflected chandelier light, blurred casino crowd behind",
-     "motion": "his eyes shift down to a large pile of money still in front of the thin man"},
-    {"id": 8, "duration": 5,
-     "image": "The tall thin man pushes all his remaining coins onto 17 black, tense crowd leaning in around the roulette table",
-     "motion": "wheel spins, ball lands on 18 red, crowd gasps",
-     "audio": "croupier: Dix-huit, rouge"},
-    {"id": 9, "duration": 5,
-     "image": "Waiters with trays of champagne flutes approach the roulette table, the thin man bows slightly and leaves with an officer, crowd grabs glasses, the man in the sand tunic is pushed aside, a young reporter happily writes in a notebook",
-     "motion": "crowd surges toward champagne, slow fade to black"}
+    {
+      "id": 10,
+      "duration": 6,
+      "image": "Close-up of a yellowed 1911 Berlin newspaper page lying on a marble café table next to a cup of coffee, dense columns of German Fraktur type, one short news column circled in pencil, a hand in a sand-colored sleeve resting beside it, warm lamp light",
+      "motion": "slow push-in on the circled column, the finger slides along the lines of text"
+    },
+    {
+      "id": 1,
+      "duration": 4,
+      "image": "Snowy night street in Berlin 1911, Kurfürstendamm, horse-drawn carriages, glowing sign 'Fortuna' above a grand casino entrance, gas lamps",
+      "motion": "slow push-in toward the entrance, snow falling, a carriage passes"
+    },
+    {
+      "id": 2,
+      "duration": 5,
+      "image": "Opulent casino hall 1911, mirrors, crystal chandeliers, dark spiral columns, gilded paintings, ladies in long dark gowns, gentlemen in tailcoats with monocles, stewards in red embroidered jackets carrying trays",
+      "motion": "smooth dolly over the crowd, stewards moving between tables"
+    },
+    {
+      "id": 3,
+      "duration": 4,
+      "image": "Clean-shaven man about 35 in a sand-colored military-style tunic, looking around a casino hall, a servant nods toward a tall thin man in a long dark-blue naval-style frock coat",
+      "motion": "the man in the tunic looks surprised, then steps back into the crowd"
+    },
+    {
+      "id": 4,
+      "duration": 5,
+      "image": "Roulette table in a 1911 casino, tall thin man in dark-blue frock coat sitting, stacks of gold and silver coins, spectators standing in a tight semicircle, croupier in tailcoat",
+      "motion": "the thin man lays out coin stacks, croupier gestures to place bets",
+      "audio": "croupier says: Faites vos jeux"
+    },
+    {
+      "id": 5,
+      "duration": 4,
+      "image": "Close-up of a hand placing a tall stack of gold coins on number 17 black on green baize; a second hand in a sand-colored sleeve pushes silver coins onto 18 red",
+      "motion": "quick hurried push of silver coins"
+    },
+    {
+      "id": 6,
+      "duration": 5,
+      "image": "Macro shot of an ivory roulette ball bouncing across brass pockets of a spinning chrome roulette wheel",
+      "motion": "ball slows and settles in pocket 24 black, croupier's rake sweeps coins away"
+    },
+    {
+      "id": 7,
+      "duration": 4,
+      "image": "Hand-drawn cartoon, extreme close-up of the young clean-shaven man in the sand-colored tunic from the reference, seen from a low side angle, pale shocked face, sweat on the forehead, chandelier bokeh behind, casino crowd blurred",
+      "motion": "he swallows, his eyes slowly drop down toward the table"
+    },
+    {
+      "id": 8,
+      "duration": 5,
+      "image": "The tall thin man pushes all his remaining coins onto 17 black, tense crowd leaning in around the roulette table",
+      "motion": "wheel spins, ball lands on 18 red, crowd gasps",
+      "audio": "croupier: Dix-huit, rouge"
+    },
+    {
+      "id": 9,
+      "duration": 5,
+      "image": "Hand-drawn cartoon, wide high-angle view from a gallery over the casino hall: waiters with trays of champagne flutes, the tall thin man in the dark-blue frock coat from the reference raises a glass and bows to the cheering crowd, the young man in the sand-colored tunic stands alone at the edge, a young reporter in a flat cap writes in a notebook",
+      "motion": "the crowd surges toward the champagne, the thin man bows and walks away, the camera slowly pulls back"
+    }
   ]
 }
