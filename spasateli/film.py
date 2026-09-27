@@ -74,33 +74,48 @@ def keyframe_path(shot_id: int) -> Path:
     return KEYFRAMES / f"shot_{shot_id:02d}.png"
 
 
+def data_url(path: Path) -> str:
+    return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode()
+
+
 def keyframe_url(shot_id: int) -> str:
     path = keyframe_path(shot_id)
     if KEYFRAME_BASE_URL:
         return f"{KEYFRAME_BASE_URL}/{path.name}"
-    return "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode()
+    return data_url(path)
 
 
 def cmd_keyframes(args) -> None:
     style, shots = load_shots(args.shots)
     KEYFRAMES.mkdir(exist_ok=True)
+    refs = [
+        {"type": "image_url", "image_url": {"url": data_url(Path(p))}}
+        for p in (args.ref or [])
+    ]
     total = 0.0
     with client() as c:
         for shot in shots:
             for v in range(args.variants):
-                r = c.post("/images", json={
+                payload = {
                     "model": IMAGE_MODEL,
                     "prompt": f"{shot['image']}. {style}",
                     "aspect_ratio": ASPECT,
                     "resolution": "1K",
-                })
+                }
+                if refs:
+                    payload["prompt"] = (
+                        "Keep the characters' faces, hair and costumes exactly as in the reference image. "
+                        + payload["prompt"]
+                    )
+                    payload["input_references"] = refs
+                r = c.post("/images", json=payload)
                 if r.status_code != 200:
                     print(f"shot {shot['id']}: HTTP {r.status_code} {r.text[:300]}")
                     break
                 body = r.json()
                 total += (body.get("usage") or {}).get("cost") or 0
                 img = base64.b64decode(body["data"][0]["b64_json"])
-                out = KEYFRAMES / f"shot_{shot['id']:02d}_v{v + 1}.png"
+                out = KEYFRAMES / f"shot_{shot['id']:02d}_{args.tag}{v + 1}.png"
                 out.write_bytes(img)
                 print(f"shot {shot['id']}: {out.name}")
     print(f"images cost: ${total:.3f}")
@@ -232,6 +247,8 @@ def main() -> None:
     k = sub.add_parser("keyframes")
     k.add_argument("--shots", help="comma-separated shot ids, default all")
     k.add_argument("--variants", type=int, default=2)
+    k.add_argument("--ref", action="append", help="reference image for character consistency, repeatable")
+    k.add_argument("--tag", default="v", help="variant file prefix, e.g. r -> shot_07_r1.png")
     k.set_defaults(func=cmd_keyframes)
 
     s = sub.add_parser("submit")
