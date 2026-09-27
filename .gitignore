@@ -7,3 +7,9 @@ dist/
 build/
 .venv/
 venv/
+spasateli/jobs.json
+spasateli/jobs.tmp
+spasateli/keyframes/
+spasateli/clips/
+spasateli/list.txt
+spasateli/scene.mp4
